@@ -1,81 +1,209 @@
-CPP-Physics: A 2D Physics Engine
----------------------
-A simple 2D physics engine built in modern C++ that simulates rigid body dynamics for simple shapes. The engine handles concepts like gravity, collision detection, and collision resolution. It uses the SFML library for visualization, making it easy to see the physics in action.
+# ⚙️ 2D Physics Engine in C++ with SFML
 
-This project is designed as a hands-on introduction to game physics, focusing on core principles rather than complex optimizations.
+A modular **2D rigid body physics engine** written in modern C++ (C++17) and powered by the **SFML** (Simple and Fast Multimedia Library) framework for real-time rendering and input handling.  
+This engine simulates basic rigid body dynamics with realistic motion, elastic collisions, and boundary constraints — forming a solid foundation for building games, simulations, or physics-based interactive applications.
 
-Features
-----------
-Rigid Body Dynamics: Simulates objects with properties like mass, position, velocity, and acceleration.
+---
 
-Vector Math: Includes a simple Vector2 class for 2D calculations.
+## 📌 Table of Contents
 
-Euler Integration: Uses a basic integration method to update object positions over time.
+1. [Overview](#-overview)
+2. [Features](#-features)
+3. [Technical Design](#-technical-design)
+4. [Core Components](#-core-components)
+5. [Physics Concepts Used](#-physics-concepts-used)
+6. [Directory Structure](#-directory-structure)
+7. [Building the Project](#-building-the-project)
+8. [Usage](#-usage)
+9. [License](#-license)
 
-Collision Detection: Implements Circle-Circle collision detection.
+---
 
-Collision Resolution: Calculates and applies impulse-based responses to make objects bounce realistically.
+## 📜 Overview
 
-Simple World Management: A World class manages all objects, applies gravity, and handles boundary constraints.
+The 2D Physics Engine is built to simulate rigid body motion in a **closed environment**. The engine supports:
 
-Interactive: Add new objects to the simulation by clicking the mouse.
+- Creation of multiple circular bodies with configurable physical properties.
+- Automatic collision detection and resolution.
+- Real-time rendering with SFML.
+- Modular and extensible code structure for future enhancements.
 
-Prerequisites
-To compile and run this project, you must have the SFML library installed on your system.
+This project emphasizes **clean architecture**, **scalability**, and **readability** while implementing fundamental concepts of classical mechanics.
 
-On Debian/Ubuntu:
-----------------
+---
 
+## ✨ Features
+
+- **Rigid Body Simulation**  
+  Circular rigid bodies with velocity, acceleration, and gravity.
+
+- **Elastic Collisions**  
+  Impulse-based collision resolution for circle-to-circle interactions.
+
+- **Boundary Constraints**  
+  Objects bounce off the screen edges using reflection physics.
+
+- **Non-Overlapping Spawns**  
+  Ensures new objects do not spawn overlapping existing ones.
+
+- **Configurable Physics Constants**  
+  Gravity, restitution (bounciness), and update frequency can be adjusted from a single config file.
+
+- **Real-Time Logging**  
+  Outputs positions and velocities of all bodies periodically to the console for debugging.
+
+- **Modular Architecture**  
+  Separation of logic into dedicated classes and source/header files for maintainability.
+
+---
+
+## 🧠 Technical Design
+
+This project follows **Object-Oriented Programming (OOP)** principles and is split into self-contained components:
+
+- **Encapsulation**: Each class manages its own data and logic.
+- **Modularity**: Independent files for utilities, physics bodies, and world management.
+- **Single Responsibility Principle**: Each class serves a focused purpose.
+
+The rendering layer (SFML) is decoupled from the physics logic, enabling potential replacement with other graphics libraries in the future.
+
+---
+
+## 🛠 Core Components
+
+### `Vector2` (in `Utils.h/.cpp`)
+
+A custom 2D vector math utility providing:
+
+- Vector addition, subtraction, scaling
+- Magnitude (length) calculation
+- Normalization
+- Dot product for collision calculations
+
+**Why custom instead of `sf::Vector2f`?**  
+Custom vectors give more control and allow integration with non-SFML environments if needed.
+
+---
+
+### `RigidBody` (in `RigidBody.h/.cpp`)
+
+Represents a **physics object**:
+
+- Properties: `position`, `velocity`, `acceleration`, `radius`, `mass`, `color`
+- Methods for updating motion using **Newton's laws of motion**:
+  - `v = u + at` (velocity update)
+  - `s = s0 + vt` (position update)
+- Handles rendering itself via SFML's shape API.
+
+---
+
+### `World` (in `World.h/.cpp`)
+
+The **simulation manager**:
+
+- Updates all bodies each frame.
+- Applies gravity and resolves collisions.
+- Maintains boundary constraints.
+- Handles object spawning with overlap checks.
+
+---
+
+### `Utils` (in `Utils.h/.cpp`)
+
+General-purpose helper functions:
+
+- Random number and color generation
+- Collision overlap checks
+- Time-based logging triggers
+
+---
+
+## 📚 Physics Concepts Used
+
+### 1. **Newtonian Motion**
+
+Objects move according to:
+
+```cpp
+velocity += acceleration * deltaTime
+position += velocity * deltaTime
+```
+
+### 2. **Elastic Collisions**
+
+For two colliding circles:
+
+- Normal vector is calculated between centers.
+- Relative velocity along the normal is inverted based on restitution.
+- Impulse is applied proportionally to each body's mass.
+
+### 3. **Boundary Reflection**
+
+When an object reaches the screen edge:
+
+- Velocity component perpendicular to the boundary is inverted.
+- Position is clamped to avoid sticking outside the screen.
+
+---
+
+## 📂 Directory Structure
+
+```
+2d_engine/
+│
+├── include/                # Header files
+│   ├── Config.h           # Physics constants (gravity, restitution, etc.)
+│   ├── RigidBody.h        # Physics object class
+│   ├── Utils.h            # Math and utility functions
+│   ├── Vector2.h          # 2D vector operations
+│   └── World.h            # Simulation manager
+│
+├── src/                   # Implementation files
+│   ├── RigidBody.cpp
+│   ├── Utils.cpp
+│   ├── Vector2.cpp
+│   └── World.cpp
+│
+├── main.cpp               # Entry point
+└── README.md
+```
+
+---
+
+## 🖥 Building the Project
+
+### Install SFML
+
+On Ubuntu / WSL:
+
+```bash
+sudo apt-get update
 sudo apt-get install libsfml-dev
+```
 
-On other systems:
-Please refer to the official SFML download page.
+### Compile
 
-You will also need a C++ compiler that supports C++17 (like g++).
+```bash
+g++ -std=c++17 src/*.cpp main.cpp -Iinclude -lsfml-graphics -lsfml-window -lsfml-system -o physics_engine
+```
 
-Getting Started
-1. Clone the Repository
-First, clone this repository to your local machine.
+---
 
-2. Compile the Project
-A Makefile is included for easy compilation. Simply run the make command.
+## 🎮 Usage
 
-make
+Run the compiled executable:
 
-Alternatively, you can compile it manually with g++:
-
-g++ -std=c++17 physics_engine.cpp -o physics_engine -lsfml-graphics -lsfml-window -lsfml-system
-
-This will create an executable file named physics_engine.
-
-3. Run the Simulation
-Launch the application to see the physics simulation.
-
+```bash
 ./physics_engine
+```
 
-You can click anywhere in the window to spawn new circles.
+**Controls:**
 
-How It Works
---------------
-The simulation runs in a loop that is updated every frame. Each frame, the following steps occur:
+- The simulation runs automatically on start.
+- New circles are spawned automatically without overlap.
 
-Apply Forces: A constant gravitational force is applied to all objects, modifying their acceleration.
+---
 
-Update Positions (Integration): The velocity of each object is updated based on its acceleration, and its position is updated based on its new velocity. This process moves the objects through the world.
+## 📜 License
 
-Handle Collisions:
------------------
-
-The engine checks every pair of objects to see if they are overlapping.
-
-If a collision is detected, the engine first separates the objects to prevent them from sticking together.
-
-It then calculates and applies an impulse to their velocities, causing them to bounce off each other in a physically plausible way.
-
-Handle Boundaries: The engine checks if any objects have moved outside the window boundaries and reverses their velocity to keep them on screen.
-
-Render: The visual representation of each object is drawn to the screen.
-
-License
------------------
-This project is open sourced.
+This project is open-source and available under the MIT License.
