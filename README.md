@@ -204,6 +204,45 @@ Run the compiled executable:
 
 ---
 
+## 🎓 Educational Value
+
+### 📚 Physics Concepts Demonstrated
+
+#### **⚡ Classical Mechanics in Action**
+
+**Newton's First Law** - Objects at rest stay at rest until you click to create them, then they remain in motion until forces act upon them. You can observe this clearly when objects settle and stop moving.
+
+**Newton's Second Law** - The fundamental F = ma relationship is visible everywhere. Heavier objects (larger mass) accelerate more slowly under the same gravitational force, and collision forces create accelerations inversely proportional to mass.
+
+**Newton's Third Law** - Every collision shows action-reaction pairs perfectly. When two objects collide, they exert equal and opposite forces on each other, which you can observe in their post-collision velocities.
+
+**Conservation of Momentum** - The total momentum of the system remains constant during collisions. Watch carefully as momentum transfers between objects - what one loses, the other gains.
+
+**Conservation of Energy** - Kinetic energy is properly transferred and partially conserved in collisions, with some energy lost to the restitution factor to simulate real-world energy dissipation.
+
+**Gravitational Acceleration** - All objects fall at the same rate regardless of mass, demonstrating one of the most counterintuitive physics principles in a visual, interactive way.
+
+#### **🧮 Vector Mathematics Applications**
+
+**Vector Addition and Subtraction** - Forces from different sources (gravity, collisions) get combined using vector mathematics, showing how multiple influences affect object motion.
+
+**Dot Product Calculations** - Used extensively in collision detection and response to project velocity vectors onto collision normal vectors.
+
+**Vector Normalization** - Converting direction vectors to unit length for collision normal calculations and force applications.
+
+**Magnitude Calculations** - Distance computations and speed measurements using the Pythagorean theorem in practical applications.
+
+#### **🔢 Numerical Methods in Practice**
+
+**Differential Equations** - Position is the integral of velocity, velocity is the integral of acceleration, all solved numerically in real-time.
+
+**Integration Techniques** - Euler method demonstrates how continuous mathematical processes get converted into discrete computational steps.
+
+**Discrete Time Stepping** - Shows how real-time simulations handle the transition from continuous mathematics to discrete computer calculations.
+
+**Numerical Stability** - Understanding why certain parameters and time steps work better than others, and recognizing stability issues when they occur.
+
 ## 📜 License
 
 This project is open-source and available under the MIT License.
+
