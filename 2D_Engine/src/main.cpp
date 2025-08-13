@@ -1,66 +1,55 @@
 #include <SFML/Graphics.hpp>
 #include "World.h"
-#include "RigidBody.h"
-#include "Config.h"
-#include "Utils.h"
-#include <iostream>
+#include "CircleShape.h"
+#include "RectangleShape.h"
 
 int main() {
-    Utils::initRandom();
+    sf::RenderWindow window(sf::VideoMode(800, 600), "2D Engine - Collision Demo");
 
-    sf::RenderWindow window(sf::VideoMode(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT), "C++ 2D Physics Engine");
-    window.setFramerateLimit(60);
+    World world;
 
-    World world(window.getSize());
+    RigidBody circle1(std::make_unique<CircleShape>(40), Vector2(200, 300), 1.0f);
+    RigidBody circle2(std::make_unique<CircleShape>(50), Vector2(500, 300), 1.0f);
+    circle2.velocity = Vector2(-50, 0);
 
-    unsigned int attempts = 0;
-    while (world.bodies.size() < Config::INITIAL_OBJECT_COUNT && attempts < Config::INITIAL_OBJECT_COUNT * Config::MAX_SPAWN_ATTEMPTS) {
-        float r = Utils::randomFloat(10.0f, 30.0f);
-        float x = Utils::randomFloat(r, Config::WINDOW_WIDTH - r);
-        float y = Utils::randomFloat(r, Config::WINDOW_HEIGHT / 2.0f);
-        if (world.canSpawnAt({x, y}, r)) {
-            world.addBody(std::make_unique<RigidBody>(x, y, r, r * r * 0.1f));
-        }
-        attempts++;
-    }
+    RigidBody rect1(std::make_unique<RectangleShape>(100, 60), Vector2(300, 500), 1.0f);
+    RigidBody rect2(std::make_unique<RectangleShape>(120, 80), Vector2(600, 500), 1.0f);
+    rect2.velocity = Vector2(-60, 0);
 
-    if (attempts >= Config::INITIAL_OBJECT_COUNT * Config::MAX_SPAWN_ATTEMPTS) {
-        std::cout << "Warning: Could not place all objects without overlap.\n";
-    }
+    world.addBody(&circle1);
+    world.addBody(&circle2);
+    world.addBody(&rect1);
+    world.addBody(&rect2);
+
+    sf::CircleShape s1(40), s2(50);
+    s1.setFillColor(sf::Color::Green);
+    s2.setFillColor(sf::Color::Red);
+
+    sf::RectangleShape r1(sf::Vector2f(100, 60)), r2(sf::Vector2f(120, 80));
+    r1.setFillColor(sf::Color::Blue);
+    r2.setFillColor(sf::Color::Magenta);
 
     sf::Clock clock;
-    float logTimer = 0.0f;
-
     while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                float r = Utils::randomFloat(10.0f, 30.0f);
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-                if (world.canSpawnAt({(float)mousePos.x, (float)mousePos.y}, r)) {
-                    world.addBody(std::make_unique<RigidBody>(mousePos.x, mousePos.y, r, r * r * 0.1f));
-                } else {
-                    std::cout << "Cannot spawn object: space occupied.\n";
-                }
-            }
-        }
+        while (window.pollEvent(event))
+            if (event.type == sf::Event::Closed) window.close();
 
         float dt = clock.restart().asSeconds();
-        world.update(dt);
+        world.step(dt);
 
-        logTimer += dt;
-        if (logTimer >= 1.0f) {
-            world.logState();
-            logTimer = 0.0f;
-        }
+        window.clear();
 
-        window.clear(sf::Color(13, 17, 23));
-        world.draw(window);
+        s1.setPosition(circle1.position.x - 40, circle1.position.y - 40);
+        s2.setPosition(circle2.position.x - 50, circle2.position.y - 50);
+        r1.setPosition(rect1.position.x - 50, rect1.position.y - 30);
+        r2.setPosition(rect2.position.x - 60, rect2.position.y - 40);
+
+        window.draw(s1);
+        window.draw(s2);
+        window.draw(r1);
+        window.draw(r2);
+
         window.display();
     }
-
-    return 0;
 }
