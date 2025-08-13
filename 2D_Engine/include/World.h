@@ -2,10 +2,12 @@
 #include <vector>
 #include "RigidBody.h"
 
-class World {
+class World
+{
 public:
-    std::vector<RigidBody*> bodies;
+    void addRigidBody(RigidBody* body);
+    void update(float dt);
 
-    void addBody(RigidBody* body);
-    void step(float dt);
+private:
+    std::vector<RigidBody*> bodies;
 };
