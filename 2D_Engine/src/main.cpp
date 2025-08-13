@@ -2,54 +2,51 @@
 #include "World.h"
 #include "CircleShape.h"
 #include "RectangleShape.h"
+#include "RigidBody.h"
+#include "Utils.h"
+#include "Config.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "2D Engine - Collision Demo");
+    Utils::initRandom();
+
+    sf::RenderWindow window(sf::VideoMode(Config::WINDOW_WIDTH, Config::WINDOW_HEIGHT), "2D Engine - Multiple Shapes Demo");
+    window.setFramerateLimit(60);
 
     World world;
 
-    RigidBody circle1(std::make_unique<CircleShape>(40), Vector2(200, 300), 1.0f);
-    RigidBody circle2(std::make_unique<CircleShape>(50), Vector2(500, 300), 1.0f);
-    circle2.velocity = Vector2(-50, 0);
+    // Create bodies using the new polymorphic rendering approach
+    RigidBody circle1(std::make_unique<CircleShape>(40.0f), Vector2(200, 300), 1.0f, false, Utils::randomColor());
+    RigidBody circle2(std::make_unique<CircleShape>(50.0f), Vector2(500, 300), 1.0f, false, Utils::randomColor());
+    circle2.velocity = Vector2(-120.0f, 0.0f);
 
-    RigidBody rect1(std::make_unique<RectangleShape>(100, 60), Vector2(300, 500), 1.0f);
-    RigidBody rect2(std::make_unique<RectangleShape>(120, 80), Vector2(600, 500), 1.0f);
-    rect2.velocity = Vector2(-60, 0);
+    RigidBody rect1(std::make_unique<RectangleShape>(100.0f, 60.0f), Vector2(300, 500), 2.0f, false, Utils::randomColor());
+    RigidBody rect2(std::make_unique<RectangleShape>(120.0f, 80.0f), Vector2(600, 500), 1.5f, false, Utils::randomColor());
+    rect2.velocity = Vector2(-90.0f, 0.0f);
 
     world.addBody(&circle1);
     world.addBody(&circle2);
     world.addBody(&rect1);
     world.addBody(&rect2);
 
-    sf::CircleShape s1(40), s2(50);
-    s1.setFillColor(sf::Color::Green);
-    s2.setFillColor(sf::Color::Red);
-
-    sf::RectangleShape r1(sf::Vector2f(100, 60)), r2(sf::Vector2f(120, 80));
-    r1.setFillColor(sf::Color::Blue);
-    r2.setFillColor(sf::Color::Magenta);
-
     sf::Clock clock;
     while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
+        }
 
         float dt = clock.restart().asSeconds();
         world.step(dt);
 
-        window.clear();
+        window.clear(sf::Color::Black);
 
-        s1.setPosition(circle1.position.x - 40, circle1.position.y - 40);
-        s2.setPosition(circle2.position.x - 50, circle2.position.y - 50);
-        r1.setPosition(rect1.position.x - 50, rect1.position.y - 30);
-        r2.setPosition(rect2.position.x - 60, rect2.position.y - 40);
-
-        window.draw(s1);
-        window.draw(s2);
-        window.draw(r1);
-        window.draw(r2);
+        // Render all bodies (delegates to shape->render)
+        circle1.render(window);
+        circle2.render(window);
+        rect1.render(window);
+        rect2.render(window);
 
         window.display();
     }
+    return 0;
 }

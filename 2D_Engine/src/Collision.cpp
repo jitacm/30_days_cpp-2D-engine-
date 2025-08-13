@@ -1,11 +1,12 @@
 #include "Collision.h"
 #include "CircleShape.h"
 #include "RectangleShape.h"
+#include "Config.h"
 #include <algorithm>
 #include <cmath>
 
 static CollisionManifold circleVsCircle(RigidBody& a, RigidBody& b) {
-    CollisionManifold m{};
+    CollisionManifold m;
     auto* cA = static_cast<CircleShape*>(a.shape.get());
     auto* cB = static_cast<CircleShape*>(b.shape.get());
 
@@ -22,7 +23,7 @@ static CollisionManifold circleVsCircle(RigidBody& a, RigidBody& b) {
 }
 
 static CollisionManifold rectVsRect(RigidBody& a, RigidBody& b) {
-    CollisionManifold m{};
+    CollisionManifold m;
     auto* rA = static_cast<RectangleShape*>(a.shape.get());
     auto* rB = static_cast<RectangleShape*>(b.shape.get());
 
@@ -46,16 +47,21 @@ static CollisionManifold rectVsRect(RigidBody& a, RigidBody& b) {
 }
 
 CollisionManifold checkCollision(RigidBody& a, RigidBody& b) {
+    if (!a.shape || !b.shape) return {};
     if (a.shape->type == ShapeType::Circle && b.shape->type == ShapeType::Circle)
         return circleVsCircle(a, b);
     if (a.shape->type == ShapeType::Rectangle && b.shape->type == ShapeType::Rectangle)
         return rectVsRect(a, b);
+
+    // For now, cross-type collisions (circle vs rect) are not implemented.
+    // They could be added here later (circle-rect SAT or clamping approach).
     return {};
 }
 
 void resolveCollision(RigidBody& a, RigidBody& b, const CollisionManifold& m) {
     if (!m.colliding) return;
 
+    // Positional correction
     if (!a.isStatic && !b.isStatic) {
         float totalMass = a.mass + b.mass;
         a.position -= m.normal * (m.penetration * (b.mass / totalMass));
@@ -66,13 +72,19 @@ void resolveCollision(RigidBody& a, RigidBody& b, const CollisionManifold& m) {
         b.position += m.normal * m.penetration;
     }
 
+    // Relative velocity
     Vector2 relativeVel = b.velocity - a.velocity;
     float velAlongNormal = relativeVel.dot(m.normal);
     if (velAlongNormal > 0) return;
 
-    float e = 0.5f;
+    float e = Config::RESTITUTION; // use configured restitution
     float j = -(1 + e) * velAlongNormal;
-    j /= (a.isStatic ? 0 : 1 / a.mass) + (b.isStatic ? 0 : 1 / b.mass);
+
+    float invMassA = a.isStatic ? 0.0f : 1.0f / a.mass;
+    float invMassB = b.isStatic ? 0.0f : 1.0f / b.mass;
+    float denom = invMassA + invMassB;
+    if (denom == 0.0f) return; // both static (shouldn't happen)
+    j /= denom;
 
     Vector2 impulse = m.normal * j;
     if (!a.isStatic) a.applyImpulse(-impulse);
