@@ -32,24 +32,22 @@ void RigidBody::update(float dt)
     shape->setPosition(shape->getPosition() + velocity * dt);
 
     // --- Simple Ground Collision ---
-    float groundLevel = 550.f; // Adjust for your window height & shape sizes
+    float groundLevel = 550.f;
     Vector2 pos = shape->getPosition();
 
-    // Circle handling (assuming position is center)
     if (shape->getType() == ShapeType::Circle)
     {
-        float radius = shape->getBoundingSize().x / 2.0f;
+        float radius = shape->getBoundingRadius();
         if (pos.y + radius > groundLevel)
         {
             pos.y = groundLevel - radius;
-            velocity.y *= -restitution; // bounce
-            if (std::abs(velocity.y) < 1.f) velocity.y = 0.f; // stop small bounces
+            velocity.y *= -restitution;
+            if (std::abs(velocity.y) < 1.f) velocity.y = 0.f;
         }
     }
-    // Rectangle handling
     else if (shape->getType() == ShapeType::Rectangle)
     {
-        float halfHeight = shape->getBoundingSize().y / 2.0f;
+        float halfHeight = shape->getHalfExtents().y;
         if (pos.y + halfHeight > groundLevel)
         {
             pos.y = groundLevel - halfHeight;
@@ -62,4 +60,14 @@ void RigidBody::update(float dt)
 
     // Reset forces
     totalForces = {0.f, 0.f};
+}
+
+Vector2 RigidBody::getPosition() const
+{
+    return shape->getPosition();
+}
+
+ShapeType RigidBody::getShapeType() const
+{
+    return shape->getType();
 }
