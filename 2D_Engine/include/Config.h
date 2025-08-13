@@ -1,13 +1,9 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
+#include "Vector2.h"
 
-namespace Config {
-    constexpr float GRAVITY_Y = 200.0f; // Pixels per second^2
-    constexpr float RESTITUTION = 0.8f; // Bounciness
-    constexpr unsigned int WINDOW_WIDTH = 800;
-    constexpr unsigned int WINDOW_HEIGHT = 600;
-    constexpr unsigned int INITIAL_OBJECT_COUNT = 15;
-    constexpr unsigned int MAX_SPAWN_ATTEMPTS = 50;
+namespace Config
+{
+    // Global gravity vector applied to all rigid bodies
+    // Default: downward force similar to Earth's gravity
+    static inline Vector2 gravity = { 0.f, 500.f }; // px/s²
 }
-
-#endif
