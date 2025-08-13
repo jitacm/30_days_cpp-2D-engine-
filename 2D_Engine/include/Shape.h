@@ -10,14 +10,19 @@ enum class ShapeType {
 class Shape {
 public:
     ShapeType type;
+    Vector2 position{0.f, 0.f};
+    sf::Color color{sf::Color::White};
+
     explicit Shape(ShapeType t) : type(t) {}
     virtual ~Shape() = default;
 
-    // Render the shape at given world position with given color
-    virtual void render(sf::RenderWindow& window, const Vector2& position, const sf::Color& color) const = 0;
+    virtual void render(sf::RenderWindow& window, const sf::Color& colorOverride, bool debugOutline = false) const = 0;
 
-    // Helper queries used by physics/world logic:
-    // For circles -> bounding radius; for rectangles -> half extents.
-    virtual float getBoundingRadius() const { return 0.0f; }
-    virtual sf::Vector2f getHalfExtents() const { return {0.f, 0.f}; }
+    virtual float getBoundingRadius() const { return 0.f; }             // for circles
+    virtual sf::Vector2f getHalfExtents() const { return {0.f, 0.f}; } // for rects
+
+    // helpers
+    void setPosition(const Vector2& p) { position = p; }
+    Vector2 getPosition() const { return position; }
+    ShapeType getType() const { return type; }
 };
