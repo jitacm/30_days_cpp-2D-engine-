@@ -1,26 +1,17 @@
-#ifndef RIGIDBODY_H
-#define RIGIDBODY_H
-
-#include <SFML/Graphics.hpp>
+#pragma once
+#include <memory>
 #include "Vector2.h"
-
-enum class BodyType { Dynamic, Static };
+#include "Shape.h"
 
 class RigidBody {
 public:
     Vector2 position;
     Vector2 velocity;
-    Vector2 acceleration;
-    float radius;
     float mass;
-    float inverseMass;
-    BodyType type;
-    sf::CircleShape shape;
+    bool isStatic;
+    std::unique_ptr<Shape> shape;
 
-    RigidBody(float x, float y, float r, float m, BodyType t = BodyType::Dynamic);
+    RigidBody(std::unique_ptr<Shape> s, Vector2 pos, float m = 1.0f, bool stat = false);
 
-    void applyForce(const Vector2& force);
-    void update(float dt);
+    void applyImpulse(const Vector2& impulse);
 };
-
-#endif

@@ -1,28 +1,9 @@
 #include "RigidBody.h"
-#include "Utils.h"
 
-RigidBody::RigidBody(float x, float y, float r, float m, BodyType t)
-    : position(x, y), radius(r), mass(m), type(t) {
-    
-    inverseMass = (mass > 0.0f && type == BodyType::Dynamic) ? 1.0f / mass : 0.0f;
+RigidBody::RigidBody(std::unique_ptr<Shape> s, Vector2 pos, float m, bool stat)
+    : shape(std::move(s)), position(pos), mass(m), isStatic(stat), velocity(0,0) {}
 
-    shape.setRadius(radius);
-    shape.setOrigin(radius, radius);
-    shape.setPosition(position.x, position.y);
-    shape.setFillColor(Utils::randomColor());
-}
-
-void RigidBody::applyForce(const Vector2& force) {
-    if (type == BodyType::Dynamic) {
-        acceleration = acceleration + force * inverseMass;
-    }
-}
-
-void RigidBody::update(float dt) {
-    if (type == BodyType::Dynamic) {
-        velocity = velocity + acceleration * dt;
-        position = position + velocity * dt;
-        acceleration = {0.0f, 0.0f};
-    }
-    shape.setPosition(position.x, position.y);
+void RigidBody::applyImpulse(const Vector2& impulse) {
+    if (!isStatic)
+        velocity += impulse * (1.0f / mass);
 }
