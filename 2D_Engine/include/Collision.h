@@ -2,9 +2,9 @@
 #include "RigidBody.h"
 
 struct CollisionManifold {
-    bool colliding;
+    bool colliding{false};
     Vector2 normal;
-    float penetration;
+    float penetration{0.0f};
 };
 
 CollisionManifold checkCollision(RigidBody& a, RigidBody& b);
