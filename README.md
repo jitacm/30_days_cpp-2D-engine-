@@ -1,231 +1,241 @@
-# ⚙️ 2D Physics Engine in C++ with SFML
+# ⚙️ 2D Physics Engine (SFML-Based)
 
-A modular **2D rigid body physics engine** written in modern C++17 and powered by the **SFML** (Simple and Fast Multimedia Library) framework for real-time rendering and input handling.  
-This engine simulates basic rigid body dynamics with realistic motion, elastic collisions, and boundary constraints — forming a solid foundation for building games, simulations, or physics-based interactive applications.
+A lightweight yet extensible 2D physics simulation engine built in C++ with SFML.  
+The engine focuses on **clean architecture**, **multiple shape support**, and **realistic motion** powered by a **gravity & force system**.  
+
+This project serves as both a **learning resource** for game physics fundamentals and a **solid base** for building 2D games or simulations.
 
 ---
 
 ## 📌 Table of Contents
 
-1. [Overview](#-overview)
-2. [Features](#-features)
-3. [Technical Design](#-technical-design)
-4. [Core Components](#-core-components)
-5. [Physics Concepts Used](#-physics-concepts-used)
-6. [Directory Structure](#-directory-structure)
-7. [Building the Project](#-building-the-project)
-8. [Usage](#-usage)
-9. [Educational Value](#-educational-value)
-10. [License](#-license)
-
----
-
-## 📜 Overview
-
-The 2D Physics Engine is built to simulate rigid body motion in a **closed environment**. The engine supports:
-
-- Circle and rectangle rigid bodies with configurable physical properties
-- Automatic collision detection and resolution
-- Real-time rendering with SFML
-- Modular, extensible, and clean architecture for future enhancements
-
-This project emphasizes **clean architecture**, **scalability**, and **readability** while implementing fundamental concepts of classical mechanics.
+1. [Preview](#preview)
+2. [Features](#features)
+3. [Project Structure](#project-structure)
+4. [Installation & Setup](#installation--setup)
+5. [Usage](#usage)
+6. [How It Works](#how-it-works)
+7. [Physics Concepts Used](#physics-concepts-used)
+8. [Extending the Engine](#extending-the-engine)
+9. [Contribution Guidelines](#contribution-guidelines)
+10. [License](#license)
+11. [Acknowledgements](#acknowledgements)
 
 ---
 
 ## ✨ Features
 
-- **Rigid Body Simulation** — Circle and rectangle shapes with mass, velocity, and position.
-- **Elastic Collisions** — Impulse-based collision resolution for both circles and rectangles.
-- **Boundary-safe & Constraints** — Objects won’t overlap after resolution and bounce off screen edges using reflection physics.
-- **Configurable Physics Constants** — Gravity, restitution, window size in `Config.h`.
-- **Random Utilities** — Random colors, numbers, and initialization helpers.
-- **Non-Overlapping Spawns** — Ensures new objects do not spawn overlapping existing ones.
-- **Real-Time Logging** — Outputs positions and velocities of all bodies periodically to the console for debugging.
-- **Clean OOP Design** — Separate headers and implementations for maintainability.
+- **Multiple Shape Support**
+  - Circle shapes
+  - Rectangle shapes
+  - Easily extendable to polygons or custom shapes
+
+- **Physics Engine**
+  - Global gravity vector applied to all rigid bodies
+  - Continuous force application (`applyForce`)
+  - Instant impulse application (`applyImpulse`)
+  - Mass-based acceleration (`F = m * a`)
+  - Basic restitution (bounciness)
+  - Configurable physics constants in one place (`Config.h`)
+
+- **Collision**
+  - Ground and shape collision detection
+  - Shape-type-aware positioning correction
+  - Velocity damping to prevent jittering
+
+- **Architecture**
+  - Clean separation of rendering (`Shape` classes) and physics (`RigidBody`, `World`)
+  - Modular design for easy extension
 
 ---
 
-## 🛠 Technical Design
-
-- **Encapsulation**: Each class manages its own data and logic.
-- **Modularity**: Physics, shapes, and utilities are split into dedicated files.
-- **Single Responsibility Principle**: Each class serves a focused purpose.
-- **Extensibility**: Adding new shapes or physics rules is straightforward.
-- The rendering layer (SFML) is decoupled from the physics logic, enabling potential replacement with other graphics libraries.
-
----
-
-## 📚 Core Components
-
-| Component   | Location                       | Description |
-|-------------|--------------------------------|-------------|
-| `Vector2`   | `include/Vector2.h`            | Custom 2D vector math class with addition, scaling, normalization, and dot product. |
-| `Shape`     | `include/Shape.h`              | Abstract base class for all shapes. |
-| `CircleShape` / `RectangleShape` | `include/CircleShape.h`, `include/RectangleShape.h` | Shape types with radius or width/height. |
-| `RigidBody` | `include/RigidBody.h`          | Represents a physical object with position, velocity, and shape. |
-| `World`     | `include/World.h`              | Simulation manager: updates positions, checks collisions, resolves overlaps. |
-| `Collision` | `include/Collision.h` & `.cpp` | Collision detection & impulse resolution for circles and rectangles. |
-| `Utils`     | `include/Utils.h`              | Random number generation, colors, initialization. |
-
-### Example Details
-
-#### `Vector2` (in `Utils.h/.cpp`)
-Custom 2D vector utility for:
-- Vector addition, subtraction, scaling
-- Magnitude (length) calculation
-- Normalization
-- Dot product for collision calculations
-
-#### `RigidBody` (in `RigidBody.h/.cpp`)
-Represents a physics object:
-- Properties: `position`, `velocity`, `acceleration`, `radius`, `mass`, `color`
-- Methods for updating motion using Newton's laws
-- Handles rendering via SFML's shape API
-
-#### `World` (in `World.h/.cpp`)
-Simulation manager:
-- Updates all bodies each frame
-- Applies gravity and resolves collisions
-- Maintains boundary constraints
-- Handles object spawning with overlap checks
-
-#### `Utils` (in `Utils.h/.cpp`)
-General-purpose helpers for:
-- Random number and color generation
-- Collision overlap checks
-- Time-based logging triggers
-
----
-
-## ⚙️ Physics Concepts Used
-
-1. **Newtonian Motion**  
-   Objects move according to:
-   ```cpp
-   velocity += acceleration * deltaTime
-   position += velocity * deltaTime
-   ```
-2. **Elastic Collisions**  
-   For two colliding circles:
-   - Normal vector between centers
-   - Relative velocity along normal, inverted based on restitution
-   - Impulse applied based on mass
-
-3. **Boundary Reflection**  
-   - Velocity component perpendicular to the boundary is inverted
-   - Position clamped to stay within screen
-
-4. **Vector Math**  
-   - Dot products, normalization, magnitude for collision and movement
-
-5. **Impulse Resolution**  
-   - Adjusts velocities after collisions based on mass & elasticity
-
----
-
-## 📂 Directory Structure
+## 🗂 Project Structure
 
 ```
-2d_engine/
+2D_Engine/
 │
-├── include/                # Header files
-│   ├── Config.h           # Physics constants (gravity, restitution, etc.)
-│   ├── RigidBody.h        # Physics object class
-│   ├── Utils.h            # Math and utility functions
-│   ├── Vector2.h          # 2D vector operations
-│   ├── Shape.h            # Abstract base class for shapes
-│   ├── CircleShape.h      # Circle shape implementation
-│   ├── RectangleShape.h   # Rectangle shape implementation
-│   ├── World.h            # Simulation manager
-│   └── Collision.h        # Collision detection/resolution
+├── include/
+│   ├── CircleShape.h        # Circle shape rendering and position API
+│   ├── Collision.h          # Collision detection/resolution
+│   ├── Config.h             # Physics constants (gravity, etc.)
+│   ├── RectangleShape.h     # Rectangle shape rendering and position API
+│   ├── RigidBody.h          # Physics object wrapper for shapes
+│   ├── Shape.h              # Shape base class
+│   ├── Utils.h              # Math and utility functions
+│   ├── Vector2.h            # Custom 2D vector math
+│   └── World.h              # Simulation manager
 │
-├── src/                   # Implementation files
+├── src/
+│   ├── Collision.cpp
 │   ├── RigidBody.cpp
 │   ├── Utils.cpp
-│   ├── Vector2.cpp
 │   ├── World.cpp
-│   └── Collision.cpp
-│   └── main.cpp               # Entry point 
+│   └── main.cpp             # Entry point and demo
+│
 └── README.md
 ```
 
 ---
 
-## 🖥 Building the Project
+## ⚙️ Installation & Setup
 
-### Install SFML
-
-On Ubuntu / WSL:
+### 1. Clone the Repository
 ```bash
-sudo apt-get update
-sudo apt-get install libsfml-dev
+git clone https://github.com/yourusername/2D_Engine.git
+cd 2D_Engine
 ```
 
-**MacOS (Homebrew):**
+### 2. Install Dependencies
+
+**SFML (>= 2.5)**
+
+- On Ubuntu:
+  ```bash
+  sudo apt-get install libsfml-dev
+  ```
+- On Windows:
+  - Download SFML from [sfml-dev.org](https://www.sfml-dev.org/)
+  - Extract and set up include/lib paths in CMake or Visual Studio
+
+### 3. Build the Project
+
+Using g++ (direct compilation):
+
 ```bash
-brew install sfml
+g++ -std=c++17 src/*.cpp -Iinclude -lsfml-graphics -lsfml-window -lsfml-system -o 2D_Engine
 ```
 
-### Compile
+Or using CMake (recommended):
 
 ```bash
-g++ -std=c++17 src/*.cpp main.cpp -Iinclude \
-    -lsfml-graphics -lsfml-window -lsfml-system -o physics_engine
+mkdir build
+cd build
+cmake ..
+make
 ```
 
 ---
 
-## 🎮 Usage
+## 🚀 Usage
 
-Run the compiled executable:
+After building, run:
 
 ```bash
-./physics_engine
+./2D_Engine
 ```
 
-- Simulation starts automatically.
-- Two circles and two rectangles will collide and react based on the physics engine.
-- New circles are spawned automatically without overlap.
+**Controls:**
+
+- Spacebar → Apply an upward impulse to the green circle
 
 ---
 
-## 🎓 Educational Value
+## 🧠 How It Works
 
-### 📚 Physics Concepts Demonstrated
+**Physics Flow per Frame:**
 
-#### **Classical Mechanics in Action**
-
-- **Newton's First Law** — Objects at rest stay at rest until you click to create them, then remain in motion until forces act upon them.
-- **Newton's Second Law** — F = ma, heavier objects accelerate more slowly under the same force.
-- **Newton's Third Law** — Every collision shows action-reaction pairs.
-- **Conservation of Momentum** — Total momentum remains constant during collisions.
-- **Conservation of Energy** — Kinetic energy is transferred and partially conserved in collisions.
-- **Gravitational Acceleration** — All objects fall at the same rate regardless of mass.
-
-#### **Vector Mathematics Applications**
-
-- **Vector Addition/Subtraction** — Forces combined via vector math.
-- **Dot Product Calculations** — Used in collision detection and response.
-- **Vector Normalization** — Unit direction vectors for collision normals.
-- **Magnitude Calculations** — Distance and speed computations.
-
-#### **Numerical Methods in Practice**
-
-- **Differential Equations** — Position and velocity updated in real-time.
-- **Integration Techniques** — Euler method for time stepping.
-- **Discrete Time Stepping** — Real-time simulation via discrete updates.
-- **Numerical Stability** — Parameter choices affect simulation stability.
+- `World::update(dt)` iterates through all rigid bodies.
+- Each `RigidBody::update(dt)`:
+  - Applies global gravity from `Config::gravity`
+  - Computes acceleration using `F = m * a`
+  - Updates velocity and position
+  - Performs ground and shape collision checks
+  - Resets forces for the next frame
 
 ---
 
-## Example Simulation
+## Physics Concepts Used
 
-- Two circles collide elastically and bounce apart.
-- Two rectangles collide and separate without overlap.
+The engine demonstrates several classical mechanics principles and vector mathematics:
+
+### 1. Newtonian Motion
+Objects update velocity & position using:
+```cpp
+velocity += acceleration * deltaTime
+position += velocity * deltaTime
+```
+
+### 2. Elastic Collisions
+- Impulse-based resolution for circles and rectangles
+- Restitution controls bounciness
+
+### 3. Boundary Reflection
+- Objects bounce off the screen edge by inverting velocity perpendicular to the boundary
+
+### 4. Vector Math
+- Custom 2D `Vector2` class for addition, scaling, normalization, dot product
+- Used in collision detection, impulse calculations, and motion updates
+
+### 5. Impulse Resolution
+- Adjusts velocities after collisions based on mass & elasticity
+
+### 6. Discrete Time Stepping & Integration
+- Euler method for real-time physics simulation
+
+### 7. Educational Value
+- Demonstrates Newton's laws, conservation of momentum & energy, and practical vector math in real-time simulation
+
+---
+
+## 💻 Example Code
+
+Below is a minimal example using the engine:
+
+```cpp
+World world;
+
+CircleShape* circle = new CircleShape(20.f, {400.f, 100.f}, sf::Color::Green);
+RigidBody* circleBody = new RigidBody(circle, 5.f, 0.3f);
+world.addRigidBody(circleBody);
+
+RectangleShape* rect = new RectangleShape({50.f, 30.f}, {200.f, 50.f}, sf::Color::Blue);
+RigidBody* rectBody = new RigidBody(rect, 10.f, 0.0f);
+world.addRigidBody(rectBody);
+```
+
+---
+
+## 🛠 Extending the Engine
+
+You can extend the engine by:
+
+- Adding new shape classes (e.g., `PolygonShape`)
+- Implementing rigid body vs rigid body collision detection
+- Adding rotational physics (torque, angular velocity)
+- Creating a particle system
+- Adding constraints and joints
+
+---
+
+## 🤝 Contribution Guidelines
+
+We welcome contributions!
+
+To contribute:
+
+1. Fork the repository
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+3. Commit changes:
+   ```bash
+   git commit -m "Implement my feature"
+   ```
+4. Push and open a pull request
+
+Please keep code modular, documented, and consistent with the style used.
 
 ---
 
 ## 📜 License
 
-This project is licensed under the MIT License — feel free to modify and use it.
+This project is licensed under the MIT License — see LICENSE for details.
+
+---
+
+## 💡 Acknowledgements
+
+- SFML for windowing, graphics, and input
+- Physics fundamentals from game development references and research
+- The C++ community for inspiration and guidance
